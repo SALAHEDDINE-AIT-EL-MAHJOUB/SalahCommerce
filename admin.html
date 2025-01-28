@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Ajouter un Produit</title>
+  
+  <!-- Style CSS pour améliorer le design -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #444;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    #produitForm {
+      max-width: 500px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #produitForm div {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-size: 1.2rem;
+      margin-bottom: 5px;
+      color: #555;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      resize: vertical;
+      height: 100px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      font-size: 1.2rem;
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    .alert {
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+
+    .alert-success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .alert-error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+  </style>
+
+  <!-- Firebase SDK avec 'type="module"' -->
+  <script type="module">
+    // Importer les modules nécessaires
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
+    
+    // Configuration Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyByAyMq8GZfMUVMKYVCjb-ksZonRDZEn_E",
+      authDomain: "mini-crm-6f0ab.firebaseapp.com",
+      databaseURL: "https://mini-crm-6f0ab-default-rtdb.firebaseio.com",
+      projectId: "mini-crm-6f0ab",
+      storageBucket: "mini-crm-6f0ab.appspot.com",
+      messagingSenderId: "943772829481",
+      appId: "1:943772829481:web:7837ec0cd1fa9bdb235938",
+      measurementId: "G-YXVWJE55K3"
+    };
+
+    // Initialisation de Firebase
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const storage = getStorage(app);
+
+    // Fonction pour ajouter un produit avec image
+    window.ajouterProduit = function() {
+      // Récupérer les valeurs du formulaire
+      const nom = document.getElementById("nom").value;
+      const prix = document.getElementById("prix").value;
+      const description = document.getElementById("description").value;
+      const fileInput = document.getElementById("photo");
+
+      // Vérifier si tous les champs sont remplis
+      if (!nom || !prix || !description || !fileInput.files[0]) {
+        alert("Tous les champs doivent être remplis, y compris la photo.");
+        return;
+      }
+
+      // Référence vers la base de données pour les produits
+      const produitRef = ref(database, 'produits');
+
+      // Obtenir la photo
+      const file = fileInput.files[0];
+      const storagePath = `produits/${file.name}`; // Chemin de stockage de l'image
+
+      // Référence vers Firebase Storage
+      const imageRef = storageRef(storage, storagePath);
+
+      // Télécharger l'image vers Firebase Storage
+      uploadBytes(imageRef, file).then((snapshot) => {
+        console.log('Image téléchargée avec succès', snapshot);
+
+        // Obtenir l'URL de l'image téléchargée
+        getDownloadURL(imageRef).then((url) => {
+          // Créer l'objet produit avec l'URL de l'image
+          const nouveauProduit = {
+            nom: nom,
+            prix: parseFloat(prix), // Assurez-vous que le prix est un nombre
+            description: description,
+            photoUrl: url // Ajouter l'URL de l'image
+          };
+
+          // Ajouter le produit à la base de données Realtime
+          push(produitRef, nouveauProduit)
+            .then(() => {
+              alert("Produit ajouté avec succès !");
+              document.getElementById("produitForm").reset(); // Réinitialiser le formulaire après ajout
+            })
+            .catch((error) => {
+              console.error("Erreur lors de l'ajout du produit : ", error);
+              alert("Erreur lors de l'ajout du produit !");
+            });
+        }).catch((error) => {
+          console.error("Erreur lors de la récupération de l'URL de l'image : ", error);
+          alert("Erreur lors du téléchargement de l'image !");
+        });
+      }).catch((error) => {
+        console.error("Erreur lors du téléchargement de l'image : ", error);
+        alert("Erreur lors du téléchargement de l'image !");
+      });
+    };
+  </script>
+</head>
+<body>
+  <h1>Page d'Administration</h1>
+  <h2>Ajouter un Produit</h2>
+
+  <!-- Formulaire pour ajouter un produit -->
+  <form id="produitForm" onsubmit="event.preventDefault(); ajouterProduit();">
+    <div>
+      <label for="nom">Nom du Produit</label>
+      <input type="text" id="nom" required>
+    </div>
+    <div>
+      <label for="prix">Prix du Produit</label>
+      <input type="number" id="prix" required>
+    </div>
+    <div>
+      <label for="description">Description du Produit</label>
+      <textarea id="description" required></textarea>
+    </div>
+    <div>
+      <label for="photo">Photo du Produit</label>
+      <input type="file" id="photo" accept="image/*" required>
+    </div>
+    <button type="submit">Ajouter le Produit</button>
+  </form>
+</body>
+</html>

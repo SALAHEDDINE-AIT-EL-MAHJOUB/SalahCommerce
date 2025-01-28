@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produits - SalahCommerce</title>
+    <link rel="stylesheet" href="css/products.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+        // Configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyByAyMq8GZfMUVMKYVCjb-ksZonRDZEn_E",
+            authDomain: "mini-crm-6f0ab.firebaseapp.com",
+            databaseURL: "https://mini-crm-6f0ab-default-rtdb.firebaseio.com",
+            projectId: "mini-crm-6f0ab",
+            storageBucket: "mini-crm-6f0ab.appspot.com",
+            messagingSenderId: "943772829481",
+            appId: "1:943772829481:web:7837ec0cd1fa9bdb235938",
+            measurementId: "G-YXVWJE55K3"
+        };
+
+        // Initialisation de Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Fonction pour afficher les produits
+        window.afficherProduits = function() {
+            const produitsRef = ref(database, 'produits');
+            get(produitsRef).then((snapshot) => {
+                const produitsDiv = document.getElementById("produitsList");
+                produitsDiv.innerHTML = ""; // Effacer les produits existants
+
+                if (snapshot.exists()) {
+                    const produits = snapshot.val();
+                    for (const id in produits) {
+                        const produit = produits[id];
+                        const produitElement = document.createElement("div");
+                        produitElement.classList.add("card");
+                        produitElement.innerHTML = `
+                            <img src="${produit.photoUrl}" alt="${produit.nom}" class="card-img">
+                            <div class="card-body">
+                                <h3>${produit.nom}</h3>
+                                <p class="price">${produit.prix}€</p>
+                                <p>${produit.description}</p>
+                                <button class="btn">Voir Détails</button>
+                            </div>
+                        `;
+                        produitsDiv.appendChild(produitElement);
+                    }
+                } else {
+                    produitsDiv.innerHTML = "<p>Aucun produit disponible</p>";
+                }
+            }).catch((error) => {
+                console.error("Erreur lors de la lecture des produits : ", error);
+                alert("Erreur lors de la lecture des produits !");
+            });
+        };
+
+        // Afficher les produits lors du chargement de la page
+        window.onload = function() {
+            afficherProduits();
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="navbar">
+            <div class="menu">
+                <h3 class="logo">Salah<span>Commerce</span></h3>
+                <div class="hamburger-menu">
+                    <div class="bar"></div>
+                </div>
+            </div>
+        </div>
+
+       
+        <div class="links">
+            <ul>
+                <li>
+                    <a href="index.html" style="--i: 0.05s">Accueil</a>
+                </li>
+                <li class="active">
+                    <a href="products.html" style="--i: 0.1s">Produits</a>
+                </li>
+                <li>
+                    <a href="admin.html" style="--i: 0.2s">Admin</a>
+                </li>
+                <li>
+                    <a href="womans_clothes.html" style="--i: 0.25s">Mode Femme</a>
+                </li>
+                <li>
+                    <a href="contact.html" style="--i: 0.15s">Contact</a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Section Produits -->
+        <div id="produitsList" class="produits-list"></div> <!-- Liste des produits affichés ici -->
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
