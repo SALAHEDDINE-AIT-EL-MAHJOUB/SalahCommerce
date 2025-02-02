@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des produits - SalahCommerce</title>
+    
+    <link rel="stylesheet" href="css/admin_products.css"> <!-- Lien vers le fichier CSS distinct -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+        // Configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyByAyMq8GZfMUVMKYVCjb-ksZonRDZEn_E",
+            authDomain: "mini-crm-6f0ab.firebaseapp.com",
+            databaseURL: "https://mini-crm-6f0ab-default-rtdb.firebaseio.com",
+            projectId: "mini-crm-6f0ab",
+            storageBucket: "mini-crm-6f0ab.appspot.com",
+            messagingSenderId: "943772829481",
+            appId: "1:943772829481:web:7837ec0cd1fa9bdb235938",
+            measurementId: "G-YXVWJE55K3"
+        };
+
+        // Initialisation de Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Fonction pour afficher tous les produits
+        window.onload = async function () {
+            const produitsDiv = document.getElementById("produitsList");
+            const loadingDiv = document.createElement("div");
+            loadingDiv.className = "loading";
+            loadingDiv.textContent = "Chargement des produits...";
+            produitsDiv.appendChild(loadingDiv);
+
+            try {
+                const produitsRef = ref(database, 'produits');
+                const snapshot = await get(produitsRef);
+                produitsDiv.innerHTML = ""; // Effacer les produits existants
+
+                if (snapshot.exists()) {
+                    const produits = snapshot.val();
+                    for (const id in produits) {
+                        const produit = produits[id];
+                        const produitElement = document.createElement("div");
+                        produitElement.classList.add("card");
+                        produitElement.innerHTML = `
+                            <img src="${produit.photoUrl}" alt="${produit.nom}" class="card-img">
+                            <div class="card-body">
+                                <h3>${produit.nom}</h3>
+                                <p class="price">${produit.prix}€</p>
+                                <p>${produit.description}</p>
+                                <a href="modifier_produit.html?id=${id}" class="btn">Modifier</a>
+                            </div>
+                        `;
+                        produitsDiv.appendChild(produitElement);
+                        setTimeout(() => {
+                            produitElement.classList.add("loaded");
+                        }, 100);
+                    }
+                } else {
+                    produitsDiv.innerHTML = "<p>Aucun produit disponible</p>";
+                }
+            } catch (error) {
+                console.error("Erreur lors de la lecture des produits : ", error);
+                produitsDiv.innerHTML = "<p>Erreur lors du chargement des produits. Veuillez réessayer.</p>";
+            }
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="navbar">
+            <div class="menu">
+                <h3 class="logo">Salah<span>Commerce</span></h3>
+                <div class="hamburger-menu">
+                    <div class="bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="links">
+            <ul>
+                <li><a href="admin.html" style="--i: 0.05s">add product </a></li>
+               
+            </ul>
+        </div>
+
+        <!-- Section Produits -->
+        <div id="produitsList" class="produits-list"></div> <!-- Liste des produits affichés ici -->
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

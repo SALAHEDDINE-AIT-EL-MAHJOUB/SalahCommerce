@@ -1,90 +1,267 @@
-/* Style de la page des produits */
-body { 
-    font-family: 'Recursive', sans-serif; 
-    background-color: #131414; /* Fond sombre pour la page */
+/* Réinitialisation de base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Container Principal */
+.container {
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Navbar */
+.navbar {
+    background: linear-gradient(to right, #4CAF50, #388E3C); /* Dégradé de couleur */
+    padding: 15px 40px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombre portée pour la profondeur */
+}
+
+.navbar .menu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar .menu .logo {
+    font-size: 2em;
     color: #fff;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.navbar .menu .logo span {
+    color: #ffeb3b; /* Couleur accent pour la partie du logo */
+}
+
+.hamburger-menu {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.hamburger-menu .bar {
+    width: 25px;
+    height: 3px;
+    background-color: #fff;
+    margin: 5px 0;
+    transition: all 0.3s;
+}
+
+/* Liens de navigation */
+.links {
+    margin-top: 10px;
+}
+
+.links ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.links ul li {
+    margin-right: 30px; /* Espacement entre les liens */
+}
+
+.links ul li a {
+    text-decoration: none;
+    color: #fff;
+    font-size: 1.1em;
+    font-weight: 500;
+    position: relative;
+    padding: 8px 10px;
+    transition: color 0.3s, transform 0.3s ease-in-out;
+}
+
+/* Animation au survol des liens */
+.links ul li a:hover {
+    color: #ffeb3b;
+    transform: translateY(-3px);
+}
+
+/* Sous-ligne animée sur le survol */
+.links ul li a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #ffeb3b;
+    transform: scaleX(0);
+    transition: transform 0.3s ease-in-out;
+}
+
+.links ul li a:hover::after {
+    transform: scaleX(1);
+}
+
+/* Menu hamburger sur mobile */
+@media (max-width: 768px) {
+    .links {
+        display: none;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .links ul {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .links ul li {
+        margin-bottom: 15px;
+    }
+
+    .hamburger-menu {
+        display: flex;
+    }
+
+    .links.active {
+        display: block;
+    }
+
+    .links ul li a {
+        font-size: 1.3em;
+    }
 }
 
 /* Section Produits */
 .produits-list {
     display: flex;
-    flex-wrap: wrap; /* Permet aux cartes de se répartir sur plusieurs lignes */
-    justify-content: center; /* Centre les cartes horizontalement */
-    padding: 40px 20px 20px; /* Ajout de padding pour espacer les cartes */
-    background-color: #000; /* Fond noir pour la section des produits */
-    min-height: 100vh; /* S'assure que la section occupe toute la hauteur de la fenêtre */
-    margin-top: 100px; /* Décale un peu vers le bas */
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-top: 40px;
+    justify-content: space-between;
 }
 
 .card {
-    height: 400px;
-    width: 250px; /* Largeur fixe des cartes */
     background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin: 15px; /* Espacement entre les cartes */
-    text-align: center;
-    padding: 15px;
-    transition: transform 0.3s ease; /* Effet de survol */
+    width: 100%;
+    max-width: 320px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+    margin-bottom: 20px;
 }
 
 .card:hover {
-    transform: scale(1.05); /* Agrandissement au survol */
+    transform: translateY(-10px);
 }
 
 .card-img {
     width: 100%;
-    height: 180px;
+    height: 250px;
     object-fit: cover;
-    border-radius: 8px;
 }
 
 .card-body {
-    padding: 10px;
+    padding: 20px;
 }
 
-.card h3 {
-    font-size: 18px;
-    color: #0e0707;
-    margin: 10px 0;
-}
-
-.card .price {
-    font-size: 16px;
-    font-weight: bold;
-    color: #28a745;
+.card-body h3 {
+    font-size: 1.4em;
+    color: #333;
     margin-bottom: 10px;
 }
 
-.card p {
-    font-size: 14px;
-    color: #100202;
-    margin-bottom: 10px;
+.card-body .price {
+    font-size: 1.2em;
+    color: #4CAF50;
+    margin-bottom: 15px;
 }
 
-.card .btn {
-    background-color: #e20f2f;
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+.card-body p {
+    font-size: 1em;
+    color: #555;
+    margin-bottom: 15px;
 }
 
-.card .btn:hover {
-    background-color: #c40a27;
+.card-body .btn {
+    display: inline-block;
+    padding: 12px 20px;
+    background-color: #4CAF50;
+    color: #fff;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1.1em;
+    transition: background-color 0.3s;
 }
 
-/* Navbar et autres éléments restent inchangés... */
+.card-body .btn:hover {
+    background-color: #45a049;
+}
 
-/* Modifications pour un alignement correct dans le conteneur */
-.navbar {
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    z-index: 10;
-    height: 5rem;
-    background-color: rgba(19, 20, 20, 0.9);
-    backdrop-filter: blur(10px);
+/* Loader */
+.loading {
+    font-size: 1.2em;
+    color: #4CAF50;
+    text-align: center;
+    margin-top: 50px;
+}
+
+/* Message d'erreur ou vide */
+.produits-list p {
+    font-size: 1.2em;
+    color: #d32f2f;
+    text-align: center;
+    margin-top: 50px;
+}
+
+/* Adaptation pour les petits écrans (mobiles) */
+@media (max-width: 480px) {
+    body {
+        font-size: 14px;
+    }
+
+    .navbar .menu .logo {
+        font-size: 1.4em;
+    }
+
+    .links ul li a {
+        font-size: 0.9em;
+    }
+
+    .produits-list {
+        justify-content: center;
+        padding: 0 10px;
+    }
+
+    .card {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .card-body h3 {
+        font-size: 1.2em;
+    }
+
+    .card-body .price {
+        font-size: 1em;
+    }
+}
+
+/* Adaptation pour les grands écrans (PC) */
+@media (min-width: 1024px) {
+    .produits-list {
+        justify-content: space-between;
+    }
+
+    .card {
+        width: 30%; /* Les cartes occupent 30% de la largeur de l'écran */
+        max-width: 320px;
+    }
 }

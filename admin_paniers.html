@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des paniers - SalahCommerce</title>
+    <link rel="stylesheet" href="css/admin_paniers.css">
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        
+        // Configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyByAyMq8GZfMUVMKYVCjb-ksZonRDZEn_E",
+            authDomain: "mini-crm-6f0ab.firebaseapp.com",
+            databaseURL: "https://mini-crm-6f0ab-default-rtdb.firebaseio.com",
+            projectId: "mini-crm-6f0ab",
+            storageBucket: "mini-crm-6f0ab.appspot.com",
+            messagingSenderId: "943772829481",
+            appId: "1:943772829481:web:7837ec0cd1fa9bdb235938",
+            measurementId: "G-YXVWJE55K3"
+        };
+        
+        // Initialisation de Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        
+        // Fonction pour afficher tous les paniers des utilisateurs
+        window.onload = async function () {
+            const paniersDiv = document.getElementById("paniersList");
+            const loadingDiv = document.createElement("div");
+            loadingDiv.className = "loading";
+            loadingDiv.textContent = "Chargement des paniers...";
+            paniersDiv.appendChild(loadingDiv);
+        
+            try {
+                // Récupérer les utilisateurs depuis la base de données
+                const paniersRef = ref(database, 'users'); // Utilisez 'users' pour récupérer les utilisateurs et leurs paniers
+                const snapshot = await get(paniersRef);
+        
+                // Effacer le message de chargement
+                paniersDiv.innerHTML = ""; 
+        
+                // Vérifier si les utilisateurs existent
+                if (snapshot.exists()) {
+                    const users = snapshot.val();
+                    console.log(users); // Afficher les utilisateurs dans la console pour le débogage
+        
+                    // Parcours de chaque utilisateur pour récupérer et afficher ses paniers
+                    for (const userId in users) {
+                        const user = users[userId];
+                        const panier = user.cart; // Assurez-vous que c'est bien 'cart' la structure des paniers dans Firebase
+        
+                        // Vérifiez si l'utilisateur a un panier
+                        if (panier && Object.keys(panier).length > 0) {
+                            // Créer un élément pour chaque panier
+                            const panierElement = document.createElement("div");
+                            panierElement.classList.add("panier-card");
+        
+                            // Construire le HTML pour afficher les produits dans le panier
+                            panierElement.innerHTML = `
+                                <h3>Panier de l'utilisateur ${userId}</h3>
+                                <ul>
+                                    ${Object.values(panier).map(produit => `
+                                        <li>${produit.nom} - ${produit.quantite} x ${produit.prix}€</li>
+                                    `).join('')}
+                                </ul>
+                                <p>Total: ${Object.values(panier).reduce((total, produit) => total + produit.quantite * produit.prix, 0)}€</p>
+                            `;
+                        
+                            // Ajouter le panier à la liste
+                            paniersDiv.appendChild(panierElement);
+                        } else {
+                            // Aucun panier pour cet utilisateur
+                            paniersDiv.innerHTML = "<p>Aucun panier trouvé pour cet utilisateur.</p>";
+                        }
+                    }
+                } else {
+                    // Aucun utilisateur trouvé
+                    paniersDiv.innerHTML = "<p>Aucun utilisateur trouvé.</p>";
+                }
+            } catch (error) {
+                // Gestion des erreurs
+                console.error("Erreur lors de la lecture des paniers : ", error);
+                paniersDiv.innerHTML = "<p>Erreur lors du chargement des paniers. Veuillez réessayer.</p>";
+            }
+        };
+        </script>
+</head>
+<body>
+    <div class="container">
+        <div class="navbar">
+            <div class="menu">
+                <h3 class="logo">Salah<span>Commerce</span></h3>
+                <div class="hamburger-menu">
+                    <div class="bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="links">
+            <ul>
+                <li><a href="admin.html" style="--i: 0.05s">Ajouter un produit</a></li>
+                <li><a href="admin_paniers.html" style="--i: 0.1s">Voir les paniers des clients</a></li>
+            </ul>
+        </div>
+
+        <!-- Section Paniers -->
+        <div id="paniersList" class="paniers-list"></div> <!-- Liste des paniers des clients affichée ici -->
+    </div>
+</body>
+</html>

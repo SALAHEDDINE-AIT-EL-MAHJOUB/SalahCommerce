@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Produits - SalahCommerce</title>
     <link rel="stylesheet" href="css/products.css">
-    <link rel="stylesheet" href="css/style.css">
+    
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
         import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
         // Configuration Firebase
@@ -24,7 +25,15 @@
 
         // Initialisation de Firebase
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const database = getDatabase(app);
+
+        // Vérifier si l'utilisateur est connecté avant de charger les produits
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "login.html"; // Rediriger vers la page de login si l'utilisateur n'est pas connecté
+            }
+        });
 
         // Fonction pour afficher les produits
         window.afficherProduits = function() {
@@ -45,7 +54,7 @@
                                 <h3>${produit.nom}</h3>
                                 <p class="price">${produit.prix}€</p>
                                 <p>${produit.description}</p>
-                                <button class="btn">Voir Détails</button>
+                                <button class="btn" onclick="ajouterAuPanier('${id}', '${produit.nom}', '${produit.prix}', '${produit.photoUrl}')">Ajouter au Panier</button>
                             </div>
                         `;
                         produitsDiv.appendChild(produitElement);
@@ -59,42 +68,81 @@
             });
         };
 
+        // Fonction pour ajouter un produit au panier
+        window.ajouterAuPanier = function(id, nom, prix, photoUrl) {
+            let panier = JSON.parse(localStorage.getItem("panier")) || []; // Récupérer le panier, ou un tableau vide si aucun produit n'a été ajouté
+
+            const produitExistant = panier.find(item => item.id === id); // Vérifier si le produit existe déjà dans le panier
+
+            if (produitExistant) {
+                produitExistant.quantite += 1; // Si le produit existe, augmenter la quantité
+            } else {
+                panier.push({
+                    id: id,
+                    nom: nom,
+                    prix: prix,
+                    photoUrl: photoUrl,
+                    quantite: 1
+                });
+            }
+
+            localStorage.setItem("panier", JSON.stringify(panier)); // Enregistrer le panier dans localStorage
+
+            alert(`${nom} a été ajouté au panier`);
+            mettreAJourPanier();
+        };
+
+        // Fonction pour mettre à jour l'icône du panier
+        function mettreAJourPanier() {
+            const panier = JSON.parse(localStorage.getItem("panier")) || [];
+            const panierCount = panier.reduce((total, item) => total + item.quantite, 0);
+            const panierLink = document.querySelector(".panier a");
+            panierLink.textContent = `Panier (${panierCount})`;
+        }
+
         // Afficher les produits lors du chargement de la page
         window.onload = function() {
             afficherProduits();
+            mettreAJourPanier();
         };
+
+        // Script pour gérer l'activation du menu hamburger sur mobile
+        const hamburger = document.querySelector('.hamburger-menu');
+        const links = document.querySelector('.links');
+
+        hamburger.addEventListener('click', () => {
+            links.classList.toggle('active');
+        });
     </script>
 </head>
 <body>
     <div class="container">
+        <!-- Barre de navigation -->
         <div class="navbar">
             <div class="menu">
                 <h3 class="logo">Salah<span>Commerce</span></h3>
                 <div class="hamburger-menu">
                     <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
                 </div>
             </div>
         </div>
-
-       
+        
+        <!-- Liens de navigation -->
         <div class="links">
             <ul>
-                <li>
-                    <a href="index.html" style="--i: 0.05s">Accueil</a>
-                </li>
-                <li class="active">
-                    <a href="products.html" style="--i: 0.1s">Produits</a>
-                </li>
-                <li>
-                    <a href="admin.html" style="--i: 0.2s">Admin</a>
-                </li>
-                <li>
-                    <a href="womans_clothes.html" style="--i: 0.25s">Mode Femme</a>
-                </li>
-                <li>
-                    <a href="contact.html" style="--i: 0.15s">Contact</a>
-                </li>
+                <li><a href="index.html" style="--i: 0.05s">Accueil</a></li>
+                <li class="active"><a href="products.html" style="--i: 0.1s">Produits</a></li>
+                <li><a href="admin.html" style="--i: 0.2s">Admin</a></li>
+                <li><a href="womans_clothes.html" style="--i: 0.25s">Mode Femme</a></li>
+                <li><a href="contact.html" style="--i: 0.15s">Contact</a></li>
             </ul>
+        </div>
+        
+        <!-- Icône du panier -->
+        <div class="panier">
+            <a href="panier.html">Panier (0)</a> <!-- Le nombre de produits dans le panier sera affiché ici -->
         </div>
 
         <!-- Section Produits -->

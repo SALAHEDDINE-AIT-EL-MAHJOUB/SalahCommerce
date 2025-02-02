@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SalahCommerce</title>
+    <link rel="stylesheet" href="css/login.css">
+    
+    <!-- Firebase Configuration -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+        
+        // Configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyByAyMq8GZfMUVMKYVCjb-ksZonRDZEn_E",
+            authDomain: "mini-crm-6f0ab.firebaseapp.com",
+            projectId: "mini-crm-6f0ab",
+            storageBucket: "mini-crm-6f0ab.appspot.com",
+            messagingSenderId: "943772829481",
+            appId: "1:943772829481:web:7837ec0cd1fa9bdb235938",
+            measurementId: "G-YXVWJE55K3"
+        };
+
+        // Initialisation Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Vérifier l'état de l'utilisateur
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                window.location.href = "products.html"; // Rediriger vers la page des produits si l'utilisateur est déjà connecté
+            }
+        });
+
+        // Fonction d'inscription
+        function inscrire() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    alert('Inscription réussie');
+                    window.location.href = "products.html"; // Rediriger vers la page des produits après inscription
+                })
+                .catch((error) => {
+                    alert(error.message);
+                });
+        }
+
+        // Fonction de connexion
+        function seConnecter() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    alert('Connexion réussie');
+                    window.location.href = "products.html"; // Rediriger vers la page des produits après connexion
+                })
+                .catch((error) => {
+                    alert(error.message);
+                });
+        }
+
+        // Ajouter des écouteurs d'événements après que le DOM soit chargé
+        window.onload = function() {
+            // Attacher l'événement pour l'inscription
+            const btnInscrire = document.getElementById('btn-inscrire');
+            btnInscrire.addEventListener('click', inscrire);
+
+            // Attacher l'événement pour la connexion
+            const btnConnexion = document.getElementById('btn-connexion');
+            btnConnexion.addEventListener('click', seConnecter);
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="login-form">
+            <h2>Connexion / Inscription</h2>
+
+            <!-- Formulaire d'inscription -->
+            <div id="form-inscription">
+                <h3>Inscription</h3>
+                <input type="email" id="email" placeholder="Email" required><br>
+                <input type="password" id="password" placeholder="Mot de passe" required><br>
+                <button id="btn-inscrire">S'inscrire</button>
+            </div>
+
+            <!-- Formulaire de connexion -->
+            <div id="form-connexion">
+                <h3>Connexion</h3>
+                <input type="email" id="email" placeholder="Email" required><br>
+                <input type="password" id="password" placeholder="Mot de passe" required><br>
+                <button id="btn-connexion">Se connecter</button>
+            </div>
+
+            <p>Vous avez déjà un compte? <a href="login.html">Connectez-vous</a></p>
+        </div>
+    </div>
+</body>
+</html>

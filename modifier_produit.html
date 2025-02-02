@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier un produit - SalahCommerce</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modifier.css">
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, get, set, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
+
+        // Configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyByAyMq8GZfMUVMKYVCjb-ksZonRDZEn_E",
+            authDomain: "mini-crm-6f0ab.firebaseapp.com",
+            databaseURL: "https://mini-crm-6f0ab-default-rtdb.firebaseio.com",
+            projectId: "mini-crm-6f0ab",
+            storageBucket: "mini-crm-6f0ab.appspot.com",
+            messagingSenderId: "943772829481",
+            appId: "1:943772829481:web:7837ec0cd1fa9bdb235938",
+            measurementId: "G-YXVWJE55K3"
+        };
+
+        // Initialisation de Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const storage = getStorage(app);
+
+        // Fonction pour afficher les détails d'un produit pour modification
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const produitId = urlParams.get('id');
+            if (produitId) {
+                const produitRef = ref(database, 'produits/' + produitId);
+                get(produitRef).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const produit = snapshot.val();
+                        document.getElementById("produitNom").value = produit.nom;
+                        document.getElementById("produitDescription").value = produit.description;
+                        document.getElementById("produitPrix").value = produit.prix;
+                        document.getElementById("produitPhotoUrl").value = produit.photoUrl;
+
+                        // Ajouter un gestionnaire d'événement pour sauvegarder les modifications
+                        document.getElementById("modifierProduitForm").onsubmit = function(event) {
+                            event.preventDefault();
+                            modifierProduit(produitId);
+                        };
+
+                        // Ajouter un gestionnaire d'événement pour supprimer le produit
+                        document.getElementById("supprimerProduitBtn").onclick = function() {
+                            supprimerProduit(produitId);
+                        };
+                    } else {
+                        alert("Produit introuvable !");
+                    }
+                }).catch((error) => {
+                    console.error("Erreur lors de la lecture du produit : ", error);
+                    alert("Erreur lors de la lecture du produit !");
+                });
+            }
+        };
+
+        // Fonction pour modifier le produit dans Firebase
+        function modifierProduit(produitId) {
+            const nom = document.getElementById("produitNom").value;
+            const description = document.getElementById("produitDescription").value;
+            const prix = parseFloat(document.getElementById("produitPrix").value);
+            let photoUrl = document.getElementById("produitPhotoUrl").value;  // URL de l'image par défaut
+
+            const fileInput = document.getElementById("produitImage");
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const storagePath = 'produits/' + produitId + '/' + file.name;
+                const imageRef = storageRef(storage, storagePath);
+
+                uploadBytes(imageRef, file).then((snapshot) => {
+                    getDownloadURL(snapshot.ref).then((downloadURL) => {
+                        // Mettre à jour l'URL de l'image dans la base de données
+                        photoUrl = downloadURL;
+                        saveProduit(produitId, nom, description, prix, photoUrl);
+                    });
+                }).catch((error) => {
+                    console.error("Erreur lors du téléchargement de l'image : ", error);
+                    alert("Erreur lors du téléchargement de l'image !");
+                });
+            } else {
+                saveProduit(produitId, nom, description, prix, photoUrl);  // Utiliser l'URL de l'image si aucune image n'est téléchargée
+            }
+        }
+
+        // Fonction pour enregistrer les modifications dans Firebase
+        function saveProduit(produitId, nom, description, prix, photoUrl) {
+            const produitRef = ref(database, 'produits/' + produitId);
+            set(produitRef, {
+                nom: nom,
+                description: description,
+                prix: prix,
+                photoUrl: photoUrl
+            }).then(() => {
+                alert("Produit modifié avec succès !");
+                window.location.href = "admin_products.html";  // Redirection vers la page de gestion des produits
+            }).catch((error) => {
+                console.error("Erreur lors de la mise à jour du produit : ", error);
+                alert("Erreur lors de la mise à jour du produit !");
+            });
+        }
+
+        // Fonction pour supprimer un produit avec vérification
+        function supprimerProduit(produitId) {
+            if (confirm("Êtes-vous sûr de vouloir supprimer ce produit ?")) {
+                const produitRef = ref(database, 'produits/' + produitId);
+                remove(produitRef).then(() => {
+                    alert("Produit supprimé avec succès !");
+                    window.location.href = "admin_products.html";  // Redirection vers la page de gestion des produits
+                }).catch((error) => {
+                    console.error("Erreur lors de la suppression du produit : ", error);
+                    alert("Erreur lors de la suppression du produit !");
+                });
+            }
+        }
+
+        // Afficher/masquer le bouton "scroll to top" selon le défilement
+        window.addEventListener("scroll", () => {
+            const scrollTopBtn = document.getElementById("scrollTopBtn");
+            if (window.scrollY > 200) { // Affiche le bouton après 200px de défilement
+                scrollTopBtn.style.display = "block";
+            } else {
+                scrollTopBtn.style.display = "none";
+            }
+        });
+
+        // Gérer le clic sur le bouton pour revenir en haut de la page
+        document.getElementById("scrollTopBtn").addEventListener("click", () => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+
+        // Fonction pour annuler la modification et revenir à la page de gestion des produits
+        function annulerModification() {
+            window.location.href = "admin_products.html"; // Redirige vers la page de gestion des produits
+        }
+
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Modifier un produit</h1>
+        <form id="modifierProduitForm">
+            <label for="produitNom">Nom du produit :</label>
+            <input type="text" id="produitNom" required>
+        
+            <label for="produitDescription">Description :</label>
+            <textarea id="produitDescription" required></textarea>
+        
+            <label for="produitPrix">Prix (€) :</label>
+            <input type="number" id="produitPrix" required>
+        
+            <label for="produitPhotoUrl">URL actuelle de l'image :</label>
+            <input type="url" id="produitPhotoUrl" disabled>
+        
+            <label for="produitImage">Télécharger une nouvelle image :</label>
+            <input type="file" id="produitImage" accept="image/*">
+        
+            <!-- Utilisation de la classe save-btn pour le bouton Sauvegarder -->
+            <button type="submit" class="save-btn">Sauvegarder</button>
+        
+            <!-- Bouton pour supprimer le produit -->
+            <button type="button" id="supprimerProduitBtn" class="delete-btn">Supprimer</button>
+        
+            <!-- Lien pour Annuler, utilisant la classe annuler-btn -->
+            <a href="admin_products.html" class="annuler-btn">Annuler</a>
+        </form>
+        
+    </div>
+
+    <!-- Bouton pour revenir en haut de la page -->
+    <button id="scrollTopBtn" title="Revenir en haut">↑</button>
+</body>
+</html>
