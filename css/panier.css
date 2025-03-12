@@ -1,0 +1,82 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+#panierListe {
+    margin-top: 20px;
+}
+
+.produit {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.produit-img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    margin-right: 20px;
+}
+
+.produit-details {
+    flex-grow: 1;
+}
+
+.quantite-controls {
+    display: none; /* Masqué par défaut */
+    align-items: center;
+    gap: 10px;
+}
+
+.quantite-controls.active {
+    display: flex; /* Affiché lorsque activé */
+}
+
+.quantite-controls button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.quantite-controls button:hover {
+    background-color: #0056b3;
+}
+
+.btn-modifier,
+.btn-terminer {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.btn-modifier:hover,
+.btn-terminer:hover {
+    background-color: #218838;
+}
+
+.btn-remove {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#totalPanier {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+}
