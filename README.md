@@ -85,8 +85,7 @@ The application is fully responsive and adapts to different screen sizes, from m
 - Order history
 
 
-## 👨‍💻 Author
-- **Salah** -([https://github.com/your-username](https://github.com/salaheddineMHJ))
-
+Contributors 👥
+Salaheddine AIT EL MAHJOUB
 ---
 ⭐️ If you find this project useful, feel free to give it a star on GitHub! ⭐️
