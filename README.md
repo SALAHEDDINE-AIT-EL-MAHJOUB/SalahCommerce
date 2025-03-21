@@ -85,7 +85,10 @@ The application is fully responsive and adapts to different screen sizes, from m
 - Order history
 
 
-Contributors 👥
-Salaheddine AIT EL MAHJOUB
+## Contributors 👥
+- **Salaheddine AIT EL MAHJOUB**  
+  [![GitHub](https://img.shields.io/badge/GitHub-Profile-blue)](https://github.com/saitelmahjoub)
+
+
 ---
 ⭐️ If you find this project useful, feel free to give it a star on GitHub! ⭐️
